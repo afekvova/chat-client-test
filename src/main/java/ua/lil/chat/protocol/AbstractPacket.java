@@ -109,7 +109,7 @@ public abstract class AbstractPacket {
 
     static {
         packets.put((short) 0, HandshakePacket.class);
-        packets.put((short) 1, MessagePacket.class);
+        packets.put((short) 1, UserMessagePacket.class);
     }
 }
 

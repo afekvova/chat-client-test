@@ -9,22 +9,24 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MessagePacket extends AbstractPacket {
+public class UserMessagePacket extends AbstractPacket {
 
-    String message;
+    String userName, message;
 
-    public MessagePacket() {
+    public UserMessagePacket() {
         super((short) 1);
     }
 
     @Override
     protected void read(ByteBuf buf) {
-        this.message = MessagePacket.readString(buf);
+        this.userName = UserMessagePacket.readString(buf);
+        this.message = UserMessagePacket.readString(buf);
     }
 
     @Override
     protected void write(ByteBuf buf) {
-        MessagePacket.writeString(buf, this.message);
+        UserMessagePacket.writeString(buf, this.userName);
+        UserMessagePacket.writeString(buf, this.message);
     }
 }
 

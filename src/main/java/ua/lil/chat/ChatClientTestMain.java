@@ -1,34 +1,36 @@
 package ua.lil.chat;
 
-import jline.console.ConsoleReader;
-import ua.lil.chat.protocol.MessagePacket;
+import ua.lil.chat.config.Settings;
+import ua.lil.chat.helpers.LogHelper;
+import ua.lil.chat.protocol.UserMessagePacket;
 
-import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ChatClientTestMain {
-    ConsoleReader consoleReader;
 
-    public ChatClientTestMain() throws IOException {
-//        consoleReader = new ConsoleReader();
-//        consoleReader.setExpandEvents(false);
-//        while (true) {
-//            String line = consoleReader.readLine();
-//            System.out.println(line);
-//        }
-    }
+    public static final Path WORKING_DIR = Paths.get(System.getProperty("user.dir"));
 
-
-    public static void main(String[] args) {
-        System.out.println("GGWP!");
-        Connector connector = new Connector("test", "127.0.0.1", 5000);
+    public static void main(String[] args) throws Exception {
+        LogHelper.info("Welcome!");
+        Settings.IMP.reload(WORKING_DIR.resolve("config.yml").toFile());
+        Scanner scanner = new Scanner(System.in);
+        LogHelper.info("Enter user name: ");
+        String userName = scanner.nextLine();
+        Connector connector = new Connector(userName, Settings.IMP.HOST, Settings.IMP.PORT);
         Connector.setInstance(connector);
         connector.start();
 
-        Scanner scanner = new Scanner(System.in);
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
-            MessagePacket packet = new MessagePacket();
+            if (line.startsWith("/") && line.trim().equalsIgnoreCase("/stop")) {
+                connector.stop();
+                continue;
+            }
+
+            UserMessagePacket packet = new UserMessagePacket();
+            packet.setUserName(userName);
             packet.setMessage(line);
             connector.sendPacket(packet);
         }
