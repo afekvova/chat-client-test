@@ -13,7 +13,7 @@ public class ChatClientTestMain {
     public static final Path WORKING_DIR = Paths.get(System.getProperty("user.dir"));
 
     public static void main(String[] args) throws Exception {
-        LogHelper.info("Welcome!");
+        LogHelper.info("Welcome! Chat Test coded by LiLTeam");
         Settings.IMP.reload(WORKING_DIR.resolve("config.yml").toFile());
         Scanner scanner = new Scanner(System.in);
         LogHelper.info("Enter user name: ");

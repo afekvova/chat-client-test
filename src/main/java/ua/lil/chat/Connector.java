@@ -1,6 +1,5 @@
 package ua.lil.chat;
 
-import com.google.common.collect.Sets;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -10,6 +9,10 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import ua.lil.chat.helpers.LogHelper;
 import ua.lil.chat.listener.Listener;
 import ua.lil.chat.listener.ListenerManager;
@@ -17,25 +20,27 @@ import ua.lil.chat.netty.NettyChannelInitializer;
 import ua.lil.chat.protocol.AbstractPacket;
 import ua.lil.chat.protocol.UserMessagePacket;
 
-import java.util.HashSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Connector {
 
-    private static boolean debug;
-    private static Connector instance;
-    private boolean enabled;
-    private Bootstrap bootstrap;
-    private EventLoopGroup group;
-    private Channel channel;
-    private ScheduledFuture reconnectScheduledFuture;
-    private String name;
-    private String host;
-    private int port;
-    private int playersCount;
-    private final HashSet registedCommands = Sets.newHashSet();
-    private final ListenerManager listenerManager = new ListenerManager();
+    @Getter
+    static boolean debug;
+    @Getter
+    static Connector instance;
+    boolean enabled;
+    Bootstrap bootstrap;
+    EventLoopGroup group;
+    Channel channel;
+    ScheduledFuture reconnectScheduledFuture;
+    @Setter
+    @Getter
+    String name, host;
+    int port;
+    @Getter
+    final ListenerManager listenerManager = new ListenerManager();
 
     public static void setInstance(Connector instance) {
         if (instance == null)
@@ -111,8 +116,6 @@ public class Connector {
 
     public void onDisconnect() {
         LogHelper.info("Lost connection to the Core... Waiting to reconnect...");
-        this.playersCount = 0;
-        this.registedCommands.clear();
         this.channel = null;
         this.reconnect();
     }
@@ -137,58 +140,6 @@ public class Connector {
     public void sendPacket(AbstractPacket packet) {
         if (this.channel != null && this.channel.isActive())
             this.channel.writeAndFlush(packet);
-    }
-
-    public static String getCoreName() {
-        return Connector.instance.name;
-    }
-
-    public static int getCoreOnline() {
-        return Connector.instance.playersCount;
-    }
-
-    public static void sendCorePacket(AbstractPacket packet) {
-        instance.sendPacket(packet);
-    }
-
-    public static boolean isCoreConnected() {
-        return instance.isConnected();
-    }
-
-    public static boolean isDebug() {
-        return debug;
-    }
-
-    public static void setDebug(boolean debug) {
-        Connector.debug = debug;
-    }
-
-    public static Connector getInstance() {
-        return instance;
-    }
-
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPlayersCount() {
-        return this.playersCount;
-    }
-
-    public HashSet getRegistedCommands() {
-        return this.registedCommands;
-    }
-
-    public ListenerManager getListenerManager() {
-        return this.listenerManager;
     }
 }
 

@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class ListenerManager {
-    
+
     private final Multimap<Class<? extends AbstractPacket>, Listener> listeners = Multimaps.synchronizedMultimap((Multimap) HashMultimap.create());
 
     public static void info(Object msg) {
@@ -37,11 +37,9 @@ public class ListenerManager {
 
     public void handleListeners(AbstractPacket packet) {
         Collection listeners = this.listeners.get(packet.getClass());
-        if (listeners != null) {
-            Iterator iterator = listeners.iterator();
-            while (iterator.hasNext()) {
-                ((Listener) iterator.next()).handle(packet);
-            }
+        Iterator iterator = listeners.iterator();
+        while (iterator.hasNext()) {
+            ((Listener) iterator.next()).handle(packet);
         }
     }
 }
